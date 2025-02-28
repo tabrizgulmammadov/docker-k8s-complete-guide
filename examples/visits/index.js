@@ -13,7 +13,7 @@ const client = redis.createClient({
  
 app.get("/", async (req, res) => {
   const visits = await client.get("visits");
-  res.send("Number of visits " + visits);
+  res.send("Number of visits: " + visits);
   await client.set("visits", parseInt(visits) + 1);
 });
  
