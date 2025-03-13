@@ -1,0 +1,24 @@
+sudo: required
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - docker build -t tabriz/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true tabriz/react-test npm test
+
+after_success:
+  - docker build -t tabriz/multi-client ./client
+  - docker build -t tabriz/multi-nginx ./nginx
+  - docker build -t tabriz/multi-server ./server
+  - docker build -t tabriz/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push tabriz/multi-client
+  - docker push tabriz/multi-nginx
+  - docker push tabriz/multi-server
+  - docker push tabriz/multi-worker
